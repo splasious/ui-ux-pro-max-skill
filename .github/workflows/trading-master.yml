@@ -1,0 +1,35 @@
+name: Trading Master
+
+on:
+  pull_request:
+    paths:
+      - 'projects/trading-master/**'
+      - '.github/workflows/trading-master.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'projects/trading-master/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/trading-master
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests (incl. anti-look-ahead suite)
+        run: python -m unittest discover -s swing_master/tests -t . -v
+
+      - name: Reference strategy runs
+        run: python research/reference_strategy.py
+
+      - name: Static export builds
+        run: TM_STATE_DIR=/tmp/tm-state python -m swing_master.main export-static /tmp/trading-master.html
