@@ -1,7 +1,7 @@
 """Application settings.
 
 Secrets are NEVER stored here -- only the names of the environment variables
-that hold them.  Everything can be overridden with ``TM_*`` environment vars.
+that hold them.  Everything can be overridden with ``SM_*`` environment vars.
 """
 from __future__ import annotations
 
@@ -29,6 +29,11 @@ class AppSettings:
     DATA_SOURCE: str = field(default_factory=lambda: _env("SM_DATA_SOURCE", "DEMO"))
     DATA_DIR: Path = field(default_factory=lambda: Path(_env("SM_DATA_DIR", str(PROJECT_ROOT / "sample_data"))))
     POSITIONING_CSV: str = field(default_factory=lambda: _env("SM_POSITIONING_CSV", ""))
+
+    # FNO -> NSE F&O underlyings only (stocks with futures + index anchors); ALL -> no filter.
+    UNIVERSE: str = field(default_factory=lambda: _env("SM_UNIVERSE", "FNO"))
+    # Optional current F&O list (NSE fo_mktlots.csv, a CSV with a SYMBOL column, or one symbol per line).
+    FNO_LIST: str = field(default_factory=lambda: _env("SM_FNO_LIST", ""))
 
     DEMO_SEED: int = field(default_factory=lambda: int(_env("SM_DEMO_SEED", "123")))
     DEMO_START: str = field(default_factory=lambda: _env("SM_DEMO_START", "2022-01-03"))

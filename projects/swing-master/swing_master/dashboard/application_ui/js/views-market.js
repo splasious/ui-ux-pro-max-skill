@@ -110,11 +110,11 @@
         return;
       }
       const f = d.funnel;
-      const steps = [["universe", "NSE universe"], ["htf_structure", "HTF structure"], ["valid_zones", "Valid zones"], ["volume_poc", "Volume / POC"],
+      const steps = [["universe", SM.state.meta.universe_info && SM.state.meta.universe_info.mode === "ALL" ? "NSE universe" : "F&amp;O universe"], ["htf_structure", "HTF structure"], ["valid_zones", "Valid zones"], ["volume_poc", "Volume / POC"],
         ["positioning", "Positioning"], ["candle", "Candle confirm"], ["rr", "R:R"], ["final", "Final candidates"]];
       const filt = { status: "ALL", dir: "ALL", q: "" };
       el.innerHTML = `
-        <div class="view-head"><div><h1>Setup scanner</h1><p>${esc(d.timeframe)} scan as of ${SM.dateTime(d.as_of)}. Statuses come from the same decision engine the backtester uses.${["4H", "1H"].includes(d.timeframe) ? " Intraday scans are computed on demand." : ""}</p></div>
+        <div class="view-head"><div><h1>Setup scanner</h1><p>${esc(d.timeframe)} scan of ${esc(SM.state.meta.universe_name)}, as of ${SM.dateTime(d.as_of)}. Statuses come from the same decision engine the backtester uses.${["4H", "1H"].includes(d.timeframe) ? " Intraday scans are computed on demand." : ""}</p></div>
           <div class="actions"><span class="muted" style="font-size:12px">Timeframe</span>${ui.seg("sctf", SM.state.meta.scanner_timeframes, tf, true)}</div></div>
         ${ui.card({ title: "Funnel", sub: "Each stage keeps the symbols that pass it", body: `<div class="funnel">${steps.map(([k, lab], i) => `
           <div class="step ${i === steps.length - 1 ? "final" : ""}"><span>${lab}</span><b>${f[k]}</b>${ui.bar(f.universe ? f[k] / f.universe : 0, i === steps.length - 1 ? "" : "up")}</div>`).join("")}</div>`,

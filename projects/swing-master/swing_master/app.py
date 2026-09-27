@@ -9,6 +9,7 @@ from __future__ import annotations
 import threading
 import time
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from .backtest.attribution import attribution
@@ -19,6 +20,7 @@ from .config import AppSettings, StrategyConfig
 from .config.scoring_config import ABLATION_LADDER, COMPONENTS
 from .data.demo import DemoMarketData
 from .data.market_data import DataUnavailable, MarketDataProvider
+from .data.universe import load_fno_list, select_universe
 from .execution.broker_interface import SafeBrokerGateway
 from .execution.order_manager import OrderManager
 from .execution.paper import PaperBroker
@@ -110,12 +112,15 @@ class Platform:
             t0 = time.time()
             records = self.provider.positioning()
             if self.settings.POSITIONING_CSV:
-                from pathlib import Path
                 from .data.positioning_data import load_participant_oi_csv
                 records = load_participant_oi_csv(Path(self.settings.POSITIONING_CSV),
                                                   self.cfg.POSITIONING_AVAILABILITY_DELAY_MIN)
             self.positioning = PositioningSuite(records, self.cfg.POSITIONING_MIN_HISTORY, self.cfg.POSITIONING_BANDS)
-            self.universe = [i for i in self.provider.universe() if self.symbols is None or i.symbol in self.symbols]
+            fno_list = load_fno_list(Path(self.settings.FNO_LIST)) if self.settings.FNO_LIST else None
+            selected, self.universe_info = select_universe(self.provider.universe(), self.settings.UNIVERSE, fno_list)
+            self.universe = [i for i in selected if self.symbols is None or i.symbol in self.symbols]
+            log("market_data", self.universe_info["label"], source=self.universe_info["source"],
+                excluded=len(self.universe_info["excluded"]))
             self.datasets: Dict[str, SymbolDataset] = analyze_universe(self.provider, self.universe, self.cfg,
                                                                        self.positioning)
             self.timings["analysis_s"] = round(time.time() - t0, 2)

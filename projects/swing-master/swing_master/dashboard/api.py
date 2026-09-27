@@ -47,7 +47,9 @@ def meta(p) -> Dict:
         "live_enabled": p.settings.LIVE_TRADING_ENABLED,
         "universe": [{"symbol": i.symbol, "name": i.name, "sector": i.sector, "is_index": i.is_index,
                       "lot_size": i.lot_size, "has_options": i.has_options} for i in p.universe],
-        "market": "NSE", "universe_name": "NIFTY 50 constituents + index futures (demo subset)",
+        "market": "NSE", "universe_name": p.universe_info["label"] + (" (demo subset)" if p.provider.is_demo else ""),
+        "universe_info": {k: v for k, v in p.universe_info.items() if k != "missing_data"}
+        | {"missing_data": len(p.universe_info["missing_data"])},
         "profile_types": list(PROFILE_TYPES),
         "min_conf": p.cfg.MIN_CONFLUENCE_SCORE, "min_zone": p.cfg.MIN_ZONE_SCORE,
         "scanner_timeframes": ["1W", "1D", "4H", "1H"], "mtf_hierarchy": p.cfg.MTF_HIERARCHY,

@@ -16,6 +16,7 @@ swing-master/
 │   ├── data/                      market_data.py (provider ABC), demo.py (synthetic, labelled), historical.py (CSV),
 │   │                              resampler.py (NSE-session buckets, completed-HTF view), websocket.py (tick→bar),
 │   │                              derivatives.py (as-of OI / PCR access), positioning_data.py (NSE participant OI)
+│   │                              universe.py (F&O-only universe: has_futures or NSE fo_mktlots.csv)
 │   ├── indicators/                atr.py (Wilder, causal), utilities.py
 │   ├── structure/                 zigzag.py (confirmed, non-repainting), pivots.py, market_structure.py, bos_choch.py
 │   ├── zones/                     demand_supply.py, zone_lifecycle.py, zone_quality.py (0-100 score)
@@ -36,7 +37,7 @@ swing-master/
 │   ├── notifications/             telegram.py (bus + Telegram channel, isolated from strategy)
 │   ├── dashboard/                 server.py (stdlib HTTP), api.py (payloads), export_static.py,
 │   │   └── application_ui/        index.html, css/themes.css (5 skins), css/app.css, js/*.js (SPA, SVG charts)
-│   └── tests/                     65 unittest cases incl. the 15 mandatory checks
+│   └── tests/                     70 unittest cases incl. the 15 mandatory checks
 └── sample_data/README.md          CSV formats for real data
 ```
 
@@ -169,7 +170,7 @@ Entries are stamped with market time and filterable on the Data Health screen.
 | 17: paper trading | Implemented (replay through `PaperBroker`) |
 | 18: broker integration | Abstraction, safeguards and Kite adapter; **live disabled by design** |
 | 19: notifications | Bus + Telegram channel (env-configured) |
-| 20: testing / security | 65 tests. Server binds to localhost, static paths are traversal-checked, no secrets in files |
+| 20: testing / security | 70 tests. Server binds to localhost, static paths are traversal-checked, no secrets in files |
 
 Needs external or live data: websocket ticks, a real option-chain feed, NSE participant-wise OI, and a live broker session.
 

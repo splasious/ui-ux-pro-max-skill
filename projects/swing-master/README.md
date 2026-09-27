@@ -22,7 +22,7 @@ The first start analyses 51 instruments × 1,200 sessions in about 5–8 seconds
 | `python3 -m swing_master.main walkforward` | Walk-forward folds, in-sample vs out-of-sample |
 | `python3 -m swing_master.main export-static dist/swing-master.html` | Self-contained, read-only HTML snapshot of the whole UI |
 | `python3 research/reference_strategy.py [--csv FILE]` | Phase-A standalone reference strategy |
-| `python3 -m unittest discover -s swing_master/tests -t .` | Test suite (65 tests, about 3 s) |
+| `python3 -m unittest discover -s swing_master/tests -t .` | Test suite (70 tests, about 3 s) |
 
 ## Works on every screen
 
@@ -81,6 +81,24 @@ The test suite proves these properties rather than asserting them in prose. The 
 ## Using real data
 
 Set `SM_DATA_SOURCE=CSV` and `SM_DATA_DIR=/path/to/data`; the file formats are in [`sample_data/README.md`](sample_data/README.md). Participant positioning can be loaded from NSE's participant-wise OI file via `SM_POSITIONING_CSV`. Mapping: Client → Retail, FII + DII → Institutional, Pro → Commercial.
+
+## F&O-only universe
+
+By default Swing Master scans and trades **NSE F&O underlyings only** (`SM_UNIVERSE=FNO`). A stock qualifies when it has exchange-traded stock futures. Index underlyings with futures (NIFTY, BANKNIFTY, FINNIFTY, ...) stay in as market-context anchors. The scanner, backtest, walk-forward, proposals and paper trading all use the same filtered list.
+
+| Variable | Effect |
+|---|---|
+| `SM_UNIVERSE=FNO` (default) | Keep stocks with futures (`has_futures=1` in `universe.csv`) plus index anchors |
+| `SM_FNO_LIST=/path/fo_mktlots.csv` | Use the exchange's current F&O list instead. NSE's `fo_mktlots.csv` works unchanged, and its lot sizes replace the ones in `universe.csv`. A CSV with a `SYMBOL` column or a text file with one symbol per line also works |
+| `SM_UNIVERSE=ALL` | No filter |
+
+The top bar, the sidebar and the scanner funnel show which universe is active. Data Health logs how many symbols were excluded.
+
+## Deploying to Vercel
+
+`vercel.json` builds the read-only dashboard during the Vercel build: `python3 -m swing_master.main export-static public/index.html`, served as a static site. Set the Vercel project's **Root Directory** to this folder (`projects/swing-master` inside the monorepo, or the repository root in a standalone checkout). The build takes about 30 s and needs only the Python 3 that ships in Vercel's build image.
+
+Vercel runs short-lived functions without a persistent disk, so the live engine does not run there. Paper trading, settings changes, background scans and Telegram alerts belong on an always-on host next to the market data (for example a VPS running `python3 -m swing_master.main serve --host 0.0.0.0`). The Vercel site shows a snapshot taken at build time.
 
 ## Execution modes and safety
 

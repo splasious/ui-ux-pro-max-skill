@@ -3,6 +3,7 @@
 Directory layout (``SM_DATA_DIR``)::
 
     universe.csv            symbol,name,sector,segment,lot_size,is_index,has_futures,has_options,strike_step
+                            (has_futures=1 marks an F&O stock; ``fno`` is accepted as an alias)
     ohlcv/<SYMBOL>.csv      date,open,high,low,close,volume          (daily, ascending)
     intraday/<SYMBOL>.csv   timestamp,open,high,low,close,volume     (5m bars, optional)
     futures_oi/<SYMBOL>.csv date,close,open_interest                 (optional)
@@ -77,7 +78,7 @@ class CSVMarketData(MarketDataProvider):
                     symbol=row["symbol"], name=row.get("name") or row["symbol"], sector=row.get("sector") or "Unknown",
                     segment=row.get("segment") or "EQ", lot_size=int(row.get("lot_size") or 1),
                     is_index=(row.get("is_index") or "0") in ("1", "true", "True"),
-                    has_futures=(row.get("has_futures") or "0") in ("1", "true", "True"),
+                    has_futures=(row.get("has_futures") or row.get("fno") or "0") in ("1", "true", "True"),
                     has_options=(row.get("has_options") or "0") in ("1", "true", "True"),
                     strike_step=float(row.get("strike_step") or 0)))
         return out

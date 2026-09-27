@@ -66,7 +66,7 @@
           <div class="demo-plate" role="note">${m.demo ? `<b>Demo · Illustrative data</b><small>${stat ? "Static preview · fictional data · no guaranteed returns" : "Fictional data for education and demonstration · no guaranteed returns"}</small>` : `<b>${esc(m.source)}</b><small>As of ${SM.dateTime(m.as_of)}</small>`}</div>
           <div class="top-ctx">
             <div class="ctx-field"><label for="ctx-market">Market</label><select class="select" id="ctx-market"><option>NSE</option></select></div>
-            <div class="ctx-field ctx-uni"><label for="ctx-uni">Universe</label><select class="select" id="ctx-uni" title="${esc(m.universe_name)}"><option>NIFTY 50 + F&amp;O (${m.universe.length})</option></select></div>
+            <div class="ctx-field ctx-uni"><label for="ctx-uni">Universe</label><select class="select" id="ctx-uni" title="${esc(m.universe_name)}"><option>${m.universe_info && m.universe_info.mode === "ALL" ? "All" : "F&amp;O"} (${m.universe.length})</option></select></div>
             <div class="ctx-field search"><label for="ctx-search">Symbol</label>${SM.icon("search")}<input class="input" id="ctx-search" type="search" autocomplete="off" placeholder="Search symbol (/)" aria-autocomplete="list" aria-controls="ctx-results" value="${esc(SM.state.symbol)}"><div class="search-results" id="ctx-results" role="listbox" hidden></div></div>
             <div class="ctx-field ctx-tf"><label for="ctx-tf">Timeframe</label><select class="select" id="ctx-tf">${m.timeframes.map((t) => `<option ${t === SM.state.tf ? "selected" : ""}>${t}</option>`).join("")}</select></div>
           </div>
@@ -85,7 +85,7 @@
         </header>
         <aside class="sidebar" id="sidebar">${sidebar}
           <div class="side-foot">
-            <div class="side-card"><div class="row"><span class="muted">Market</span><b>NSE</b></div><div class="row"><span class="muted">Universe</span><b>${esc(String(m.universe.length))} instruments</b></div>
+            <div class="side-card"><div class="row"><span class="muted">Market</span><b>NSE</b></div><div class="row" title="${esc(m.universe_name)}"><span class="muted">Universe</span><b>${m.universe_info && m.universe_info.mode === "ALL" ? "All" : "F&amp;O"} · ${esc(String(m.universe.length))}</b></div>
               <div class="row"><span class="muted">Mode</span><b>${esc(SM.title(m.execution_mode))}</b></div></div>
             <a class="side-card side-theme" href="#settings" style="display:none;align-items:center;gap:8px">${SM.icon("palette")}<b>Theme</b><span class="muted" style="margin-left:auto">${esc((SM.skins.find((s) => s.id === SM.resolvedSkin()) || {}).name || "")}</span></a>
             <div class="side-card"><h4><span class="status-dot"></span>Paper trading <span class="badge b-up" style="margin-left:auto">On</span></h4><span class="muted">Replay of recent sessions through the live decision engine.</span></div>
