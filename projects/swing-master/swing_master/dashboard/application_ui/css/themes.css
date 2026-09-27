@@ -1,0 +1,180 @@
+/* ==========================================================================
+   Swing Master -- five interchangeable skins
+   --------------------------------------------------------------------------
+   * Bare :root holds the complete light palette ("Daylight").
+   * With no explicit skin, the OS / host dark preference selects "Midnight".
+   * An explicit skin (html[data-skin="..."]) always wins -- every skin block
+     defines the full token set so no colour ever leaks between skins.
+   Components use tokens only; no raw colours outside this file.
+   ========================================================================== */
+
+:root {
+  /* Daylight (light) */
+  --bg: #f3f6fb; --bg-2: #ffffff; --panel: #ffffff; --panel-2: #f5f8fc; --panel-hover: #eef3fa;
+  --border: #e1e7f0; --border-strong: #cdd7e4;
+  --text: #0f1b2d; --text-2: #32445d; --muted: #5d6e86;
+  --accent: #1766f0; --accent-2: #1766f0; --accent-ink: #ffffff; --accent-soft: rgba(23, 102, 240, 0.10);
+  --up: #0c8f5a; --down: #d3343f; --warn: #b87400; --info: #1766f0;
+  --up-soft: rgba(12, 143, 90, 0.12); --down-soft: rgba(211, 52, 63, 0.10); --warn-soft: rgba(217, 138, 6, 0.14);
+  --demand: #10a068; --demand-fill: rgba(16, 160, 104, 0.14); --supply: #de4450; --supply-fill: rgba(222, 68, 80, 0.13);
+  --poc: #ef8a00; --profile: #6aa0f7; --profile-va: #3b82f6;
+  --grid: rgba(15, 27, 45, 0.06); --axis: #6b7b91; --candle-up: #0c9a60; --candle-down: #e0404b;
+  --shadow: 0 1px 2px rgba(15, 27, 45, 0.05), 0 4px 16px rgba(15, 27, 45, 0.05);
+  --demo-bg: #e8f0ff; --demo-ink: #1257d6; --demo-border: #c9dafb;
+  --focus: #1766f0;
+  --font-body: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-brand: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-num: var(--font-body);
+  --brand-weight: 800; --brand-transform: uppercase; --brand-tracking: 0.02em;
+  --radius: 12px; --radius-sm: 8px; --nav-active-bg: var(--accent-soft); --nav-active-ink: var(--accent);
+  --nav-active-border: transparent;
+  color-scheme: light;
+}
+
+/* Midnight Teal -- default dark (no explicit skin, dark preference) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #071526; --bg-2: #081a2d; --panel: #0b1e33; --panel-2: #0e243c; --panel-hover: #12304e;
+    --border: #1a3553; --border-strong: #26496e;
+    --text: #e6eef8; --text-2: #bccbdc; --muted: #8aa1bb;
+    --accent: #1f7df2; --accent-2: #19c9a3; --accent-ink: #ffffff; --accent-soft: rgba(31, 125, 242, 0.18);
+    --up: #2ccf97; --down: #ff6275; --warn: #f5b83d; --info: #4c9bff;
+    --up-soft: rgba(44, 207, 151, 0.14); --down-soft: rgba(255, 98, 117, 0.14); --warn-soft: rgba(245, 184, 61, 0.14);
+    --demand: #2bb683; --demand-fill: rgba(43, 182, 131, 0.18); --supply: #e05566; --supply-fill: rgba(224, 85, 102, 0.22);
+    --poc: #f5b83d; --profile: #2f5f93; --profile-va: #4a86c7;
+    --grid: rgba(126, 160, 200, 0.09); --axis: #7f97b2; --candle-up: #24c28b; --candle-down: #f0556a;
+    --shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 8px 24px rgba(0, 0, 0, 0.25);
+    --demo-bg: transparent; --demo-ink: #e6eef8; --demo-border: transparent;
+    --focus: #5aa2ff;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-brand: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-num: var(--font-body);
+    --brand-weight: 700; --brand-transform: uppercase; --brand-tracking: 0.03em;
+    --radius: 10px; --radius-sm: 7px; --nav-active-bg: #1f7df2; --nav-active-ink: #ffffff;
+    --nav-active-border: transparent;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"],
+:root[data-skin="midnight"] {
+  --bg: #071526; --bg-2: #081a2d; --panel: #0b1e33; --panel-2: #0e243c; --panel-hover: #12304e;
+  --border: #1a3553; --border-strong: #26496e;
+  --text: #e6eef8; --text-2: #bccbdc; --muted: #8aa1bb;
+  --accent: #1f7df2; --accent-2: #19c9a3; --accent-ink: #ffffff; --accent-soft: rgba(31, 125, 242, 0.18);
+  --up: #2ccf97; --down: #ff6275; --warn: #f5b83d; --info: #4c9bff;
+  --up-soft: rgba(44, 207, 151, 0.14); --down-soft: rgba(255, 98, 117, 0.14); --warn-soft: rgba(245, 184, 61, 0.14);
+  --demand: #2bb683; --demand-fill: rgba(43, 182, 131, 0.18); --supply: #e05566; --supply-fill: rgba(224, 85, 102, 0.22);
+  --poc: #f5b83d; --profile: #2f5f93; --profile-va: #4a86c7;
+  --grid: rgba(126, 160, 200, 0.09); --axis: #7f97b2; --candle-up: #24c28b; --candle-down: #f0556a;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 8px 24px rgba(0, 0, 0, 0.25);
+  --demo-bg: transparent; --demo-ink: #e6eef8; --demo-border: transparent;
+  --focus: #5aa2ff;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-brand: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-num: var(--font-body);
+  --brand-weight: 700; --brand-transform: uppercase; --brand-tracking: 0.03em;
+  --radius: 10px; --radius-sm: 7px; --nav-active-bg: #1f7df2; --nav-active-ink: #ffffff;
+  --nav-active-border: transparent;
+  color-scheme: dark;
+}
+
+/* Imperial Gold -- black lacquer and brushed gold */
+:root[data-skin="imperial"] {
+  --bg: #0a0b0d; --bg-2: #0e0f12; --panel: #131417; --panel-2: #18191d; --panel-hover: #202126;
+  --border: #2a2b31; --border-strong: #3d3c40;
+  --text: #efe8da; --text-2: #cfc6b4; --muted: #9a9181;
+  --accent: #d8aa52; --accent-2: #ecc97b; --accent-ink: #1b1407; --accent-soft: rgba(216, 170, 82, 0.13);
+  --up: #3ec783; --down: #ef5a5f; --warn: #e3b457; --info: #d8aa52;
+  --up-soft: rgba(62, 199, 131, 0.13); --down-soft: rgba(239, 90, 95, 0.13); --warn-soft: rgba(227, 180, 87, 0.14);
+  --demand: #2f9e66; --demand-fill: rgba(47, 158, 102, 0.26); --supply: #c9434a; --supply-fill: rgba(201, 67, 74, 0.34);
+  --poc: #e3b457; --profile: #56565c; --profile-va: #8b7a55;
+  --grid: rgba(216, 190, 140, 0.07); --axis: #9a9181; --candle-up: #34b574; --candle-down: #e5484d;
+  --shadow: 0 1px 0 rgba(255, 236, 190, 0.03) inset, 0 10px 28px rgba(0, 0, 0, 0.4);
+  --demo-bg: transparent; --demo-ink: #ecc97b; --demo-border: transparent;
+  --focus: #ecc97b;
+  --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-brand: "Cinzel", "Trajan Pro", Georgia, serif;
+  --font-num: var(--font-body);
+  --brand-weight: 600; --brand-transform: uppercase; --brand-tracking: 0.06em;
+  --radius: 8px; --radius-sm: 6px; --nav-active-bg: rgba(216, 170, 82, 0.12); --nav-active-ink: #ecc97b;
+  --nav-active-border: #8a6a2e;
+  color-scheme: dark;
+}
+
+/* Ultraviolet -- indigo night, violet primary, cyan signal */
+:root[data-skin="ultraviolet"] {
+  --bg: #0a0918; --bg-2: #0c0b1e; --panel: #11102a; --panel-2: #161535; --panel-hover: #1d1b46;
+  --border: #25235a; --border-strong: #37348d;
+  --text: #edecff; --text-2: #c7c5ee; --muted: #9895ca;
+  --accent: #7a5cff; --accent-2: #3ee6f0; --accent-ink: #ffffff; --accent-soft: rgba(122, 92, 255, 0.2);
+  --up: #2edca3; --down: #ff5b79; --warn: #f6c343; --info: #3ee6f0;
+  --up-soft: rgba(46, 220, 163, 0.13); --down-soft: rgba(255, 91, 121, 0.14); --warn-soft: rgba(246, 195, 67, 0.14);
+  --demand: #20a57c; --demand-fill: rgba(32, 165, 124, 0.25); --supply: #d8435f; --supply-fill: rgba(216, 67, 95, 0.3);
+  --poc: #f6c343; --profile: #4a3fc4; --profile-va: #6d5df2;
+  --grid: rgba(160, 150, 255, 0.07); --axis: #9895ca; --candle-up: #26d49b; --candle-down: #ff4f6e;
+  --shadow: 0 0 0 1px rgba(122, 92, 255, 0.04), 0 10px 30px rgba(3, 0, 20, 0.45);
+  --demo-bg: transparent; --demo-ink: #c7c5ee; --demo-border: transparent;
+  --focus: #3ee6f0;
+  --font-body: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Sora", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-brand: "Sora", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-num: var(--font-body);
+  --brand-weight: 700; --brand-transform: uppercase; --brand-tracking: 0.01em;
+  --radius: 12px; --radius-sm: 8px; --nav-active-bg: #6247e6; --nav-active-ink: #ffffff;
+  --nav-active-border: #8b73ff;
+  color-scheme: dark;
+}
+
+/* Daylight -- explicit light skin */
+:root[data-skin="daylight"] {
+  --bg: #f3f6fb; --bg-2: #ffffff; --panel: #ffffff; --panel-2: #f5f8fc; --panel-hover: #eef3fa;
+  --border: #e1e7f0; --border-strong: #cdd7e4;
+  --text: #0f1b2d; --text-2: #32445d; --muted: #5d6e86;
+  --accent: #1766f0; --accent-2: #1766f0; --accent-ink: #ffffff; --accent-soft: rgba(23, 102, 240, 0.10);
+  --up: #0c8f5a; --down: #d3343f; --warn: #b87400; --info: #1766f0;
+  --up-soft: rgba(12, 143, 90, 0.12); --down-soft: rgba(211, 52, 63, 0.10); --warn-soft: rgba(217, 138, 6, 0.14);
+  --demand: #10a068; --demand-fill: rgba(16, 160, 104, 0.14); --supply: #de4450; --supply-fill: rgba(222, 68, 80, 0.13);
+  --poc: #ef8a00; --profile: #6aa0f7; --profile-va: #3b82f6;
+  --grid: rgba(15, 27, 45, 0.06); --axis: #6b7b91; --candle-up: #0c9a60; --candle-down: #e0404b;
+  --shadow: 0 1px 2px rgba(15, 27, 45, 0.05), 0 4px 16px rgba(15, 27, 45, 0.05);
+  --demo-bg: #e8f0ff; --demo-ink: #1257d6; --demo-border: #c9dafb;
+  --focus: #1766f0;
+  --font-body: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-brand: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-num: var(--font-body);
+  --brand-weight: 800; --brand-transform: uppercase; --brand-tracking: 0.02em;
+  --radius: 12px; --radius-sm: 8px; --nav-active-bg: rgba(23, 102, 240, 0.10); --nav-active-ink: #1766f0;
+  --nav-active-border: transparent;
+  color-scheme: light;
+}
+
+/* Cyan Terminal -- deep sea navy, cyan instrument light, red demo plate */
+:root[data-skin="terminal"] {
+  --bg: #06101b; --bg-2: #081522; --panel: #0a1928; --panel-2: #0d2033; --panel-hover: #112a42;
+  --border: #16304a; --border-strong: #214669;
+  --text: #e2f1fb; --text-2: #b6ccdc; --muted: #7d98b0;
+  --accent: #17d0ef; --accent-2: #17d0ef; --accent-ink: #02131b; --accent-soft: rgba(23, 208, 239, 0.14);
+  --up: #25d796; --down: #ff5a69; --warn: #f5b83d; --info: #17d0ef;
+  --up-soft: rgba(37, 215, 150, 0.13); --down-soft: rgba(255, 90, 105, 0.13); --warn-soft: rgba(245, 184, 61, 0.14);
+  --demand: #1aa57a; --demand-fill: rgba(26, 165, 122, 0.26); --supply: #c4394b; --supply-fill: rgba(196, 57, 75, 0.3);
+  --poc: #f5b83d; --profile: #245f93; --profile-va: #2f86c4;
+  --grid: rgba(90, 170, 220, 0.08); --axis: #7d98b0; --candle-up: #1fd08f; --candle-down: #f24b5b;
+  --shadow: 0 0 0 1px rgba(23, 208, 239, 0.03), 0 10px 26px rgba(0, 0, 0, 0.35);
+  --demo-bg: #c92f3d; --demo-ink: #ffffff; --demo-border: #e24a57;
+  --focus: #17d0ef;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Rajdhani", "IBM Plex Sans", system-ui, sans-serif;
+  --font-brand: "Rajdhani", "IBM Plex Sans", system-ui, sans-serif;
+  --font-num: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --brand-weight: 700; --brand-transform: uppercase; --brand-tracking: 0.04em;
+  --radius: 8px; --radius-sm: 6px; --nav-active-bg: rgba(23, 208, 239, 0.12); --nav-active-ink: #17d0ef;
+  --nav-active-border: #17d0ef;
+  color-scheme: dark;
+}
