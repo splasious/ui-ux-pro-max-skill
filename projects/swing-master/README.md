@@ -96,7 +96,12 @@ The top bar, the sidebar and the scanner funnel show which universe is active. D
 
 ## Deploying to Vercel
 
-`vercel.json` builds the read-only dashboard during the Vercel build: `python3 -m swing_master.main export-static public/index.html`, served as a static site. Set the Vercel project's **Root Directory** to this folder (`projects/swing-master` inside the monorepo, or the repository root in a standalone checkout). The build takes about 30 s and needs only the Python 3 that ships in Vercel's build image.
+Two ways, both producing the same static site:
+
+* **Project linked to GitHub** (needs a GitHub login connection on the Vercel account): set the project's **Root Directory** to this folder (`projects/swing-master` in the monorepo, or the repository root in a standalone checkout). `vercel.json` then runs `python3 -m swing_master.main export-static public/index.html` on every push.
+* **No GitHub link:** deploy the two files in [`deploy/vercel/`](deploy/vercel). Their build script clones the public branch, then runs the same export. `SM_GIT_REPO`, `SM_GIT_REF` and `SM_GIT_SUBDIR` choose the source. Redeploy to pick up new commits.
+
+The build takes about 30 s and needs only the Python 3 and git that ship in Vercel's build image.
 
 Vercel runs short-lived functions without a persistent disk, so the live engine does not run there. Paper trading, settings changes, background scans and Telegram alerts belong on an always-on host next to the market data (for example a VPS running `python3 -m swing_master.main serve --host 0.0.0.0`). The Vercel site shows a snapshot taken at build time.
 
