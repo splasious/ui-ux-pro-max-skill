@@ -24,8 +24,9 @@ class AppSettings:
     HOST: str = field(default_factory=lambda: _env("SM_HOST", "127.0.0.1"))
     PORT: int = field(default_factory=lambda: int(_env("SM_PORT", "8765")))
 
-    # DEMO -> deterministic synthetic data, clearly labelled everywhere.
-    # CSV  -> historical files from DATA_DIR (see data/historical.py for the format).
+    # DEMO          -> deterministic synthetic data, clearly labelled everywhere.
+    # CSV           -> historical files from DATA_DIR (see data/historical.py for the format).
+    # TRADINGMASTER -> real NSE data from a TradingMaster backend's API (see data/tradingmaster.py).
     DATA_SOURCE: str = field(default_factory=lambda: _env("SM_DATA_SOURCE", "DEMO"))
     DATA_DIR: Path = field(default_factory=lambda: Path(_env("SM_DATA_DIR", str(PROJECT_ROOT / "sample_data"))))
     POSITIONING_CSV: str = field(default_factory=lambda: _env("SM_POSITIONING_CSV", ""))
@@ -34,6 +35,16 @@ class AppSettings:
     UNIVERSE: str = field(default_factory=lambda: _env("SM_UNIVERSE", "FNO"))
     # Optional current F&O list (NSE fo_mktlots.csv, a CSV with a SYMBOL column, or one symbol per line).
     FNO_LIST: str = field(default_factory=lambda: _env("SM_FNO_LIST", ""))
+
+    # TradingMaster API (credentials are read from the env vars named below, never stored)
+    TM_API_URL: str = field(default_factory=lambda: _env("SM_TM_API_URL", "https://api.tradingmaster.online/api/v1"))
+    TM_EMAIL_ENV: str = "SM_TM_EMAIL"
+    TM_PASSWORD_ENV: str = "SM_TM_PASSWORD"
+    TM_TOKEN_ENV: str = "SM_TM_TOKEN"
+    TM_HISTORY_DAYS: int = field(default_factory=lambda: int(_env("SM_TM_HISTORY_DAYS", "1825")))
+    TM_WORKERS: int = field(default_factory=lambda: int(_env("SM_TM_WORKERS", "6")))
+    # Optional symbol,sector CSV for stocks the built-in map does not classify
+    SECTOR_MAP: str = field(default_factory=lambda: _env("SM_SECTOR_MAP", ""))
 
     DEMO_SEED: int = field(default_factory=lambda: int(_env("SM_DEMO_SEED", "123")))
     DEMO_START: str = field(default_factory=lambda: _env("SM_DEMO_START", "2022-01-03"))

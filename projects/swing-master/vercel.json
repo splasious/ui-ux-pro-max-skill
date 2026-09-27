@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "python3 --version",
-  "buildCommand": "SM_STATE_DIR=/tmp/sm-state python3 -m swing_master.main export-static public/index.html",
+  "buildCommand": "SM_STATE_DIR=/tmp/sm-state python3 -m swing_master.main export-static public --split",
   "outputDirectory": "public",
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- .",
   "headers": [

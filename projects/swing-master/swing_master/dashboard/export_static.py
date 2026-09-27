@@ -6,12 +6,15 @@ server.  Screens or symbols that were not exported say so explicitly.
 
     python -m swing_master.main export-static dist/swing-master.html
     python -m swing_master.main export-static dist/page.html --artifact   # no <html>/<head>/<body> wrapper
+    python -m swing_master.main export-static public --split             # index.html + d/*.json loaded on demand
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import shutil
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 from urllib.parse import quote
 
 from ..schemas import to_jsonable
@@ -99,21 +102,24 @@ def collect(p) -> Dict[str, Any]:
     return data
 
 
-def build_html(p, artifact: bool = False) -> str:
-    data = collect(p)
-    payload = json.dumps({"generated": p.as_of.isoformat(), "data": data}, separators=(",", ":"))
-    payload = payload.replace("</", "<\\/")
+INLINE_KEYS = ("/api/meta", "/api/overview")  # needed for the first paint; everything else loads on demand
+
+
+def _page(p, snapshot: Dict[str, Any], artifact: bool) -> str:
+    payload = json.dumps(snapshot, separators=(",", ":")).replace("</", "<\\/")
     css = (UI / "css" / "themes.css").read_text() + "\n" + (UI / "css" / "app.css").read_text()
     js = "\n".join((UI / "js" / f).read_text() for f in SCRIPTS)
+    what = "demo snapshot, fictional data" if p.provider.is_demo else f"snapshot of {p.provider.source_label}"
     head = f"""<title>Swing Master</title>
-<meta name="description" content="Swing-trading research terminal with five interchangeable themes (static demo snapshot).">
+<meta name="description" content="Swing-trading research terminal with five interchangeable themes ({what}).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230b1b2b%27/%3E%3Cpath d=%27M5 22l7-8 5 5 10-11%27 fill=%27none%27 stroke=%27%2322d3ae%27 stroke-width=%273%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
 <style>
 {css}
 </style>
-<script>try {{ var s = JSON.parse(localStorage.getItem("tm.skin") || '"auto"'); if (s && s !== "auto") document.documentElement.setAttribute("data-skin", s); }} catch (e) {{}}</script>"""
+<script>try {{ var s = JSON.parse(localStorage.getItem("sm.skin") || '"auto"'); if (s && s !== "auto") document.documentElement.setAttribute("data-skin", s); }} catch (e) {{}}</script>"""
     body = f"""<div id="app"><div class="loading" role="status">Loading Swing Master…</div></div>
 <script>window.__SM_SNAPSHOT__ = {payload};</script>
 <script>
@@ -133,6 +139,36 @@ def build_html(p, artifact: bool = False) -> str:
 </body>
 </html>
 """
+
+
+def build_html(p, artifact: bool = False) -> str:
+    return _page(p, {"generated": p.as_of.isoformat(), "data": collect(p)}, artifact)
+
+
+def export_split(p, outdir: str) -> Tuple[int, int, int]:
+    """Write OUTDIR/index.html plus one JSON file per view under OUTDIR/d/, fetched on demand.
+
+    For hosting (e.g. Vercel): a large universe would make a single-file snapshot tens of MB.
+    Returns (index.html bytes, number of data files, total data bytes).
+    """
+    data = collect(p)
+    out = Path(outdir)
+    shutil.rmtree(out / "d", ignore_errors=True)
+    (out / "d").mkdir(parents=True, exist_ok=True)
+    inline = {k: data[k] for k in (*INLINE_KEYS, "__errors__") if k in data}
+    files: Dict[str, str] = {}
+    total = 0
+    for k, v in data.items():
+        if k in inline:
+            continue
+        name = "d/" + hashlib.sha1(k.encode()).hexdigest()[:20] + ".json"
+        raw = json.dumps(v, separators=(",", ":"))
+        (out / name).write_text(raw, encoding="utf-8")
+        files[k] = name
+        total += len(raw)
+    html = _page(p, {"generated": p.as_of.isoformat(), "data": inline, "files": files}, False)
+    (out / "index.html").write_text(html, encoding="utf-8")
+    return len(html.encode("utf-8")), len(files), total
 
 
 def export(p, out: str, artifact: bool = False) -> int:

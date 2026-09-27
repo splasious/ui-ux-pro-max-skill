@@ -21,8 +21,9 @@ The first start analyses 51 instruments × 1,200 sessions in about 5–8 seconds
 | `python3 -m swing_master.main backtest` | Full-history KPIs |
 | `python3 -m swing_master.main walkforward` | Walk-forward folds, in-sample vs out-of-sample |
 | `python3 -m swing_master.main export-static dist/swing-master.html` | Self-contained, read-only HTML snapshot of the whole UI |
+| `python3 -m swing_master.main export-static public --split` | The same snapshot as `index.html` + per-screen JSON files, for hosting |
 | `python3 research/reference_strategy.py [--csv FILE]` | Phase-A standalone reference strategy |
-| `python3 -m unittest discover -s swing_master/tests -t .` | Test suite (70 tests, about 3 s) |
+| `python3 -m unittest discover -s swing_master/tests -t .` | Test suite (80 tests, about 5 s) |
 
 ## Works on every screen
 
@@ -82,6 +83,36 @@ The test suite proves these properties rather than asserting them in prose. The 
 
 Set `SM_DATA_SOURCE=CSV` and `SM_DATA_DIR=/path/to/data`; the file formats are in [`sample_data/README.md`](sample_data/README.md). Participant positioning can be loaded from NSE's participant-wise OI file via `SM_POSITIONING_CSV`. Mapping: Client → Retail, FII + DII → Institutional, Pro → Commercial.
 
+## Real data from TradingMaster
+
+[TradingMaster](https://github.com/splasious/TradingMaster) (served at `api.tradingmaster.online`) stores NSE cash and NFO data backfilled from Zerodha Kite. Swing Master can read that store directly:
+
+```bash
+export SM_DATA_SOURCE=TRADINGMASTER
+export SM_TM_EMAIL=you@example.com         # a TradingMaster login, read from the environment only
+export SM_TM_PASSWORD='...'
+python3 -m swing_master.main serve
+```
+
+| What Swing Master reads | TradingMaster endpoint |
+|---|---|
+| F&O universe: every underlying with backfilled NFO contracts | `GET /options/underlyings` |
+| Names, index flags, INDIA VIX | `GET /instruments?exchange=NSE` |
+| Futures contracts: expiry, lot size | `GET /instruments?exchange=NFO&q=FUT` |
+| Daily and intraday OHLCV, futures open interest | `GET /market-data/candles` |
+| Current option chain | `GET /options/{id}/expiries`, `GET /options/{id}/chain` |
+
+The connector only logs in and reads; it never writes to TradingMaster. It logs in again automatically when TradingMaster's 15-minute token expires.
+
+* **Universe:** F&O by construction. A stock appears only when TradingMaster holds NFO contracts for it, and it needs at least 120 completed daily bars. Skipped symbols are listed in Data Health.
+* **Timestamps:** converted from UTC to IST. Daily bars are keyed by IST date. Today's daily bar before 15:30 and unfinished intraday bars are ignored.
+* **Futures OI:** the nearest unexpired contract on each date. ΔOI compares the same contract day over day.
+* **Options:** TradingMaster keeps only the current chain, so PCR exists for the latest session. Its per-strike change is measured from the day's open, so ΔOI PCR reports itself unavailable instead of mixing the two definitions.
+* **Intraday:** 1H and 4H come from stored 60-minute candles, falling back to 15- or 5-minute candles if needed.
+* **Sectors:** built in for common names. `SM_SECTOR_MAP=/path/sectors.csv` (`symbol,sector`) covers the rest. An unclassified stock counts as its own sector in the concentration check.
+
+Other settings: `SM_TM_API_URL` (default `https://api.tradingmaster.online/api/v1`), `SM_TM_TOKEN` (use an existing access token instead of email and password), `SM_TM_HISTORY_DAYS` (default 1825) and `SM_TM_WORKERS` (parallel requests, default 6).
+
 ## F&O-only universe
 
 By default Swing Master scans and trades **NSE F&O underlyings only** (`SM_UNIVERSE=FNO`). A stock qualifies when it has exchange-traded stock futures. Index underlyings with futures (NIFTY, BANKNIFTY, FINNIFTY, ...) stay in as market-context anchors. The scanner, backtest, walk-forward, proposals and paper trading all use the same filtered list.
@@ -101,7 +132,9 @@ Two ways, both producing the same static site:
 * **Project linked to GitHub** (needs a GitHub login connection on the Vercel account): set the project's **Root Directory** to this folder (`projects/swing-master` in the monorepo, or the repository root in a standalone checkout). `vercel.json` then runs `python3 -m swing_master.main export-static public/index.html` on every push.
 * **No GitHub link:** deploy the two files in [`deploy/vercel/`](deploy/vercel). Their build script clones the public branch, then runs the same export. `SM_GIT_REPO`, `SM_GIT_REF` and `SM_GIT_SUBDIR` choose the source. Redeploy to pick up new commits.
 
-The build takes about 30 s and needs only the Python 3 and git that ship in Vercel's build image.
+The Vercel build uses `export-static public --split`. It writes a small `index.html` plus one JSON file per screen under `public/d/`, fetched when that screen opens. A 200-stock F&O universe therefore doesn't turn into a single page of tens of megabytes. To build from real data, add `SM_DATA_SOURCE=TRADINGMASTER`, `SM_TM_EMAIL` and `SM_TM_PASSWORD` to the Vercel project's environment variables (mark the credentials **Sensitive**) and redeploy. The data is as of the build, so redeploy after each session to refresh it.
+
+A demo build takes about 30 s and needs only the Python 3 and git that ship in Vercel's build image.
 
 Vercel runs short-lived functions without a persistent disk, so the live engine does not run there. Paper trading, settings changes, background scans and Telegram alerts belong on an always-on host next to the market data (for example a VPS running `python3 -m swing_master.main serve --host 0.0.0.0`). The Vercel site shows a snapshot taken at build time.
 

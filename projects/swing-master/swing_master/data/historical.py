@@ -20,7 +20,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Dict, List
 
-from ..schemas import Availability, Bar, FuturesOIRecord, Instrument
+from ..schemas import UNCLASSIFIED_SECTOR, Availability, Bar, FuturesOIRecord, Instrument
 from .market_data import DataUnavailable, MarketDataProvider
 from .positioning_data import load_participant_oi_csv
 from .resampler import TF_MINUTES, resample_intraday, session_close, session_open
@@ -75,7 +75,7 @@ class CSVMarketData(MarketDataProvider):
         with open(self.data_dir / "universe.csv", newline="") as fh:
             for row in csv.DictReader(fh):
                 out.append(Instrument(
-                    symbol=row["symbol"], name=row.get("name") or row["symbol"], sector=row.get("sector") or "Unknown",
+                    symbol=row["symbol"], name=row.get("name") or row["symbol"], sector=row.get("sector") or UNCLASSIFIED_SECTOR,
                     segment=row.get("segment") or "EQ", lot_size=int(row.get("lot_size") or 1),
                     is_index=(row.get("is_index") or "0") in ("1", "true", "True"),
                     has_futures=(row.get("has_futures") or row.get("fno") or "0") in ("1", "true", "True"),

@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional
 
 from ..indicators.utilities import pearson, pct_returns
+from ..schemas import UNCLASSIFIED_SECTOR
 from .position_size import position_size
 
 
@@ -48,7 +49,9 @@ class PortfolioRiskManager:
         add("Max portfolio risk", current_risk + new_risk <= max_risk + 1e-6,
             f"open {current_risk:,.0f} + new {new_risk:,.0f} vs cap {max_risk:,.0f}")
 
-        sector_pos = [p for p in positions + pending if p.sector == sector]
+        # An unclassified symbol is its own group: lumping unknown sectors together would cap them as one.
+        sector_pos = [p for p in positions + pending
+                      if p.sector == sector and (sector != UNCLASSIFIED_SECTOR or p.symbol == symbol)]
         sector_value = sum(p.position_value for p in sector_pos) + (size.position_value if size.valid else 0.0)
         sector_ok = (len(sector_pos) < cfg.MAX_POSITIONS_PER_SECTOR and
                      sector_value <= cfg.MAX_SECTOR_EXPOSURE * equity + 1e-6)

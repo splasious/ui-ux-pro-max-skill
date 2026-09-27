@@ -116,6 +116,15 @@
       const snap = window.__SM_SNAPSHOT__;
       if (snap) {
         if (Object.prototype.hasOwnProperty.call(snap.data, k)) return snap.data[k];
+        const file = snap.files && snap.files[k];
+        if (file) {  // split snapshot: one JSON file per view, fetched on first use
+          if (cache.has(k)) return cache.get(k);
+          const res = await fetch(file, { headers: { Accept: "application/json" } });
+          if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          const body = await res.json();
+          cache.set(k, body);
+          return body;
+        }
         throw new Unavailable("This view is not included in the static preview. Run the local server for every symbol and timeframe.");
       }
       if (!opts.fresh && cache.has(k)) return cache.get(k);

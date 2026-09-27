@@ -5,6 +5,7 @@
     python -m swing_master.main backtest
     python -m swing_master.main walkforward
     python -m swing_master.main export-static OUT.html [--artifact]
+    python -m swing_master.main export-static OUTDIR --split
 """
 from __future__ import annotations
 
@@ -29,6 +30,8 @@ def main(argv=None) -> int:
     e = sub.add_parser("export-static", help="write a self-contained HTML snapshot of the UI")
     e.add_argument("out")
     e.add_argument("--artifact", action="store_true", help="omit the document skeleton (for artifact hosting)")
+    e.add_argument("--split", action="store_true",
+                   help="OUT is a directory: index.html plus one JSON file per view, loaded on demand (for hosting)")
     args = ap.parse_args(argv)
 
     settings = AppSettings()
@@ -50,9 +53,14 @@ def main(argv=None) -> int:
             print(f["fold"], f["test"], f["params"], "IS avgR", f["train_metrics"]["average_r"],
                   "OOS avgR", f["test_metrics"]["average_r"], "OOS trades", f["test_metrics"]["total_trades"])
     elif args.cmd == "export-static":
-        from .dashboard.export_static import export
-        size = export(platform, args.out, artifact=args.artifact)
-        print(f"wrote {args.out} ({size / 1e6:.2f} MB)")
+        if args.split:
+            from .dashboard.export_static import export_split
+            page, n, total = export_split(platform, args.out)
+            print(f"wrote {args.out}/index.html ({page / 1e6:.2f} MB) + {n} data files ({total / 1e6:.2f} MB)")
+        else:
+            from .dashboard.export_static import export
+            size = export(platform, args.out, artifact=args.artifact)
+            print(f"wrote {args.out} ({size / 1e6:.2f} MB)")
     return 0
 
 

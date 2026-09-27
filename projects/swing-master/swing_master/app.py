@@ -72,11 +72,17 @@ class Platform:
         self.cfg = cfg or StrategyConfig()
         self.cfg.validate()
         if provider is None:
-            if self.settings.is_demo:
+            source = self.settings.DATA_SOURCE.upper()
+            if source == "DEMO":
                 provider = DemoMarketData(self.settings.DEMO_SEED, self.settings.DEMO_START, self.settings.DEMO_END)
-            else:
+            elif source == "TRADINGMASTER":
+                from .data.tradingmaster import from_settings
+                provider = from_settings(self.settings)
+            elif source == "CSV":
                 from .data.historical import CSVMarketData
                 provider = CSVMarketData(self.settings.DATA_DIR)
+            else:
+                raise ValueError(f"SM_DATA_SOURCE must be DEMO, CSV or TRADINGMASTER, got {source!r}")
         self.provider = provider
         self.symbols = symbols
         self.bus = NotificationBus()

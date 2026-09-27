@@ -27,7 +27,9 @@ def compute_pcr(chain: Optional[OptionChainSnapshot], n_each_side: int = 10, min
     put_d = sum(s.put_change_oi for s in strikes)
     pcr = put_oi / call_oi if call_oi > 0 else None
     d_reason = None
-    if chain.expiry_rollover:
+    if not chain.change_oi_available:
+        d_pcr, d_reason = None, "Source has no ΔOI vs the previous session"
+    elif chain.expiry_rollover:
         d_pcr, d_reason = None, "Expiry rollover: ΔOI resets with the new series"
     elif call_d <= 0:
         d_pcr, d_reason = None, "Call ΔOI <= 0: ratio undefined"

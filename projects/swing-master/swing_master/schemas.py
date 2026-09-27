@@ -46,6 +46,10 @@ class Trend:
     UNDEFINED = "UNDEFINED"
 
 
+# Sector for symbols the data source does not classify; risk checks treat each as its own group.
+UNCLASSIFIED_SECTOR = "Unclassified"
+
+
 class Availability:
     DIRECT = "DIRECT"
     PROXY = "PROXY"
@@ -350,6 +354,8 @@ class OptionChainSnapshot:
     available_at: datetime
     expiry_rollover: bool = False
     source_type: str = Availability.PROXY
+    # False when the source's per-strike change is not "vs the previous session" (ΔOI PCR then reports why)
+    change_oi_available: bool = True
 
 
 # --------------------------------------------------------------------------- #

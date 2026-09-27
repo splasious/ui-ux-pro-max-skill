@@ -95,6 +95,23 @@ class PlatformTests(unittest.TestCase):
         self.assertGreater(repo.count("system_logs"), 10)
         self.assertEqual(repo.count("options_snapshots"), 1)  # NIFTY is the only option underlying here
 
+    def test_split_static_export(self):
+        import json
+        import re
+        from swing_master.dashboard.export_static import export_split
+        with tempfile.TemporaryDirectory() as tmp:
+            page, n, total = export_split(self.p, tmp)
+            html = (Path(tmp) / "index.html").read_text()
+            snap = json.loads(re.search(r"window.__SM_SNAPSHOT__ = (.*?);</script>", html, re.S).group(1))
+            self.assertEqual(set(snap["data"]), {"/api/meta", "/api/overview"})
+            self.assertEqual(len(snap["files"]), n)
+            self.assertGreater(total, page, "view data lives in the lazy files, not the page")
+            key = "/api/chart?profile=FIXED&symbol=RELIANCE&tf=1D"
+            chart = json.loads((Path(tmp) / snap["files"][key]).read_text())
+            self.assertEqual(chart["symbol"], "RELIANCE")
+            self.assertEqual(len(list((Path(tmp) / "d").iterdir())), n)
+            self.assertIn('localStorage.getItem("sm.skin"', html)
+
     def test_audit_log_categories(self):
         cats = set(api.health_payload(self.p)["log_counts"])
         for c in ("pivot", "structure", "zone", "signal"):

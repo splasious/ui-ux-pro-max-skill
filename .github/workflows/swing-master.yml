@@ -31,5 +31,7 @@ jobs:
       - name: Reference strategy runs
         run: python research/reference_strategy.py
 
-      - name: Static export builds
-        run: SM_STATE_DIR=/tmp/tm-state python -m swing_master.main export-static /tmp/swing-master.html
+      - name: Static export builds (single file and split)
+        run: |
+          SM_STATE_DIR=/tmp/sm-state python -m swing_master.main export-static /tmp/swing-master.html
+          SM_STATE_DIR=/tmp/sm-state python -m swing_master.main export-static /tmp/swing-master-site --split
